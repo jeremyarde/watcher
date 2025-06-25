@@ -20,7 +20,7 @@ pub fn load_scripts() -> HashMap<ScriptType, String> {
         ScriptType::ForegroundApp,
         String::from(
             r#"
-        tell application \"System Events\"
+        tell application "System Events"
             get name of first application process whose frontmost is true
         end tell
     "#,
@@ -31,7 +31,7 @@ pub fn load_scripts() -> HashMap<ScriptType, String> {
         ScriptType::ForegroundWindowTitle,
         String::from(
             r#"
-        tell application \"System Events\"
+        tell application "System Events"
             set frontApp to first application process whose frontmost is true
             try
                 get name of front window of frontApp
@@ -48,10 +48,10 @@ pub fn load_scripts() -> HashMap<ScriptType, String> {
         String::from(
             r#"
         try
-            tell application \"Safari\"
+            tell application "Safari"
                 set tabName to name of current tab of front window
                 set tabURL to URL of current tab of front window
-                return tabName & \" | \" & tabURL
+                return tabName & " | " & tabURL
             end tell
         on error
             return ""
@@ -64,11 +64,11 @@ pub fn load_scripts() -> HashMap<ScriptType, String> {
         ScriptType::ChromeTabInfo,
         String::from(
             r#"
-        tell application \"Google Chrome\"
+        tell application "Google Chrome"
             set tabName to title of active tab of front window
             set tabURL to URL of active tab of front window
         end tell
-        return tabName & \" | \" & tabURL
+        return tabName & " | " & tabURL
     "#,
         ),
     );
@@ -77,7 +77,7 @@ pub fn load_scripts() -> HashMap<ScriptType, String> {
         ScriptType::WifiNetwork,
         String::from(
             r#"
-        do shell script \"networksetup -getairportnetwork en0 | cut -d ':' -f2 | sed 's/^ *//'\"
+        do shell script "networksetup -getairportnetwork en0 | cut -d ':' -f2 | sed 's/^ *//'"
     "#,
         ),
     );
@@ -86,22 +86,22 @@ pub fn load_scripts() -> HashMap<ScriptType, String> {
         ScriptType::IdleTime,
         String::from(
             r#"
-        do shell script \"ioreg -c IOHIDSystem | awk '/HIDIdleTime/ {print $NF/1000000000; exit}'\"
+        do shell script "ioreg -c IOHIDSystem | awk '/HIDIdleTime/ {print $NF/1000000000; exit}'"
     "#,
         ),
     );
 
     map.insert(ScriptType::LockScreen, String::from(r#"
-        do shell script "/System/Library/CoreServices/Menu\\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+        do shell script "/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession -suspend"
     "#));
 
     map.insert(
         ScriptType::StartPomodoroReminder,
         String::from(
             r#"
-        tell application \"Reminders\"
+        tell application "Reminders"
             set dueDate to (current date) + (25 * minutes)
-            make new reminder with properties {name:\"Take a break\", remind me date:dueDate}
+            make new reminder with properties {name:"Take a break", remind me date:dueDate}
         end tell
     "#,
         ),
@@ -112,10 +112,10 @@ pub fn load_scripts() -> HashMap<ScriptType, String> {
         String::from(
             r#"
         try
-            tell application \"Slack\" to quit
+            tell application "Slack" to quit
         end try
         try
-            tell application \"Discord\" to quit
+            tell application "Discord" to quit
         end try
     "#,
         ),
