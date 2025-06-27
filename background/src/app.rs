@@ -40,19 +40,36 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn run_check(&mut self) {
+    pub fn run_check(&self) -> AppState {
+        let mut new_state = self.clone();
         let now = Instant::now();
-        let session = create_session(&self.scripts);
+        let session = create_session(&new_state.scripts);
 
-        if session.app != self.active_session.as_ref().unwrap().app {
-            self.active_session.as_mut().unwrap().end_at = now;
-            self.sessions.push(self.active_session.take().unwrap());
-            self.active_session = Some(session);
-            self.active_session.as_mut().unwrap().start_at = now;
+        if let Some(active) = new_state.active_session.as_ref() {
+            if session.app != active.app {
+                if let Some(active_mut) = new_state.active_session.as_mut() {
+                    active_mut.end_at = now;
+                }
+                new_state
+                    .sessions
+                    .push(new_state.active_session.take().unwrap());
+                new_state.active_session = Some(session);
+                if let Some(active_mut) = new_state.active_session.as_mut() {
+                    active_mut.start_at = now;
+                }
+            } else {
+                if let Some(active_mut) = new_state.active_session.as_mut() {
+                    active_mut.end_at = now;
+                }
+            }
         } else {
-            self.active_session.as_mut().unwrap().end_at = now;
+            new_state.active_session = Some(session);
+            if let Some(active_mut) = new_state.active_session.as_mut() {
+                active_mut.start_at = now;
+            }
         }
-        self.stats = self.compute_stats();
+        new_state.stats = new_state.compute_stats();
+        new_state
     }
 
     pub fn compute_stats(&self) -> Stats {

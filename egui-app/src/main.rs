@@ -1,5 +1,7 @@
+use arc_swap::ArcSwap;
 use background::app::AppState;
 use eframe::egui;
+use eframe::egui::viewport::ViewportId;
 use log::info;
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
@@ -17,7 +19,7 @@ fn main() -> eframe::Result {
 
     info!("Starting app");
 
-    let appstate = Arc::new(RwLock::new(AppState::new()));
+    let appstate = Arc::new(ArcSwap::from_pointee(AppState::new()));
     let appstate_clone = Arc::clone(&appstate);
     thread::spawn(move || {
         puffin::profile_scope!("run_check");
@@ -25,11 +27,11 @@ fn main() -> eframe::Result {
         let mut last_check = Instant::now();
         loop {
             if last_check.elapsed() >= Duration::from_secs(1) {
-                appstate_clone.write().run_check();
+                let new_state = appstate_clone.load().run_check();
+                appstate_clone.store(Arc::new(new_state));
                 last_check = Instant::now();
             }
-            // Sleep for a short time to avoid busy-waiting, but not long enough to cause lag
-            // thread::sleep(Duration::from_millis(50));
+            thread::sleep(Duration::from_millis(50));
         }
     });
 
@@ -56,12 +58,15 @@ fn main() -> eframe::Result {
 // #[derive(Deserialize, Serialize)]
 #[derive(Debug)]
 pub struct MyApp {
-    appstate: Arc<RwLock<AppState>>,
+    appstate: Arc<ArcSwap<AppState>>,
+    notification_open: bool,
+    notification_viewport_id: ViewportId,
+    show_immediate_viewport: bool,
 }
 
 impl MyApp {
     /// Called once before the first frame.
-    pub fn new(cc: &eframe::CreationContext<'_>, appstate: Arc<RwLock<AppState>>) -> Self {
+    pub fn new(cc: &eframe::CreationContext<'_>, appstate: Arc<ArcSwap<AppState>>) -> Self {
         info!("Creating app");
         // This is also where you can customize the look and feel of egui using
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
@@ -74,7 +79,12 @@ impl MyApp {
             // let appstate = eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
         }
 
-        MyApp { appstate: appstate }
+        MyApp {
+            appstate,
+            notification_open: false,
+            notification_viewport_id: ViewportId::from_hash_of("notification_window"),
+            show_immediate_viewport: false,
+        }
     }
 }
 
@@ -98,42 +108,117 @@ impl eframe::App for MyApp {
                         if ui.button("Quit").clicked() {
                             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                         }
+                        // Move theme preference buttons here
+                        egui::widgets::global_theme_preference_buttons(ui);
                     });
                     ui.add_space(16.0);
                 }
-
-                egui::widgets::global_theme_preference_buttons(ui);
             });
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
             puffin::profile_scope!("central_panel");
-            let appstate = self.appstate.read();
-            // Display a single line of text with the current session details and timer
-            let session_text = if let Some(session) = appstate.active_session.clone() {
-                puffin::profile_scope!("session_text");
+            let appstate = self.appstate.load();
+            let active_session = appstate.active_session.clone();
+            let stats = appstate.stats.clone();
 
-                // Calculate timer using only start_at and current time
-                let now = std::time::Instant::now();
-                let duration = now.duration_since(session.start_at);
-                let secs = duration.as_secs();
-                let mins = secs / 60;
-                let secs = secs % 60;
-                ctx.request_repaint(); // Ensure the UI updates every frame
-                format!(
-                    "App: {} | Window: {} | Time: {:02}:{:02}",
-                    session.app.trim(),
-                    session.window_title.trim(),
-                    mins,
-                    secs
-                )
-            } else {
-                "No session data available".to_string()
-            };
-            ui.label(session_text);
+            // Notification button
+            // if ui.button("🔔 Notifications").clicked() {
+            //     if !self.notification_open() {
+            //         self.set_notification_open(true);
+            //     }
+            // }
+            ui.checkbox(
+                &mut self.show_immediate_viewport,
+                "Show immediate child viewport",
+            );
 
-            ui.label(format!("{:#?}", appstate.stats.clone()))
+            let mut show_deferred_viewport = self.notification_open;
+            ui.checkbox(&mut show_deferred_viewport, "Show deferred child viewport");
+            self.notification_open = show_deferred_viewport;
+
+            ui.horizontal(|ui| {
+                if let Some(session) = active_session {
+                    let now = std::time::Instant::now();
+                    let duration = now.duration_since(session.start_at);
+                    let secs = duration.as_secs();
+                    let mins = secs / 60;
+                    let secs = secs % 60;
+                    ui.label(egui::RichText::new(format!("{}", session.app.trim())).strong());
+                    ui.add_space(4.0);
+                    ui.label(egui::RichText::new(session.window_title.trim()).italics());
+                    ui.add_space(4.0);
+                    ui.label(egui::RichText::new(format!("⏱ {:02}:{:02}", mins, secs)).monospace());
+                } else {
+                    ui.label("No session");
+                }
+
+                // Top 3 apps summary, compact
+                let mut app_times: Vec<_> = stats.total_time_per_app.iter().collect();
+                app_times.sort_by_key(|&(_, &d)| std::cmp::Reverse(d));
+                if !app_times.is_empty() {
+                    ui.add_space(8.0);
+                    for (i, (app, duration)) in app_times.iter().take(3).enumerate() {
+                        let mins = duration.as_secs() / 60;
+                        let secs = duration.as_secs() % 60;
+                        if i > 0 {
+                            ui.add_space(4.0);
+                        }
+                        ui.label(format!("{}: {:02}:{:02}", app.trim(), mins, secs));
+                    }
+                }
+            });
+            ctx.request_repaint();
         });
+
+        // Show notification viewport if open
+        if self.notification_open {
+            let notification_viewport_id = self.notification_viewport_id;
+            ctx.show_viewport_deferred(
+                notification_viewport_id,
+                eframe::egui::ViewportBuilder::default()
+                    .with_title("Notifications")
+                    .with_inner_size([300.0, 200.0]),
+                move |ctx, _class| {
+                    eframe::egui::CentralPanel::default().show(ctx, |ui| {
+                        ui.label("This is your notifications window!");
+                        if ui.button("Close").clicked() {
+                            ctx.send_viewport_cmd_to(
+                                notification_viewport_id,
+                                egui::ViewportCommand::Close,
+                            );
+                        }
+                        // Add more notification-related buttons here
+                    });
+                },
+            );
+        }
+
+        if self.show_immediate_viewport {
+            ctx.show_viewport_immediate(
+                egui::ViewportId::from_hash_of("immediate_viewport"),
+                egui::ViewportBuilder::default()
+                    .with_title("Immediate Viewport")
+                    .with_inner_size([200.0, 100.0]),
+                |ctx, class| {
+                    assert!(
+                        class == egui::ViewportClass::Immediate,
+                        "This egui backend doesn't support multiple viewports"
+                    );
+
+                    egui::CentralPanel::default().show(ctx, |ui| {
+                        ui.label("Hello from immediate viewport");
+                    });
+
+                    if ctx.input(|i| i.viewport().close_requested()) {
+                        // Tell parent viewport that we should not show next frame:
+                        self.show_immediate_viewport = false;
+                    }
+                },
+            );
+        }
+
+        // Track notification window state
     }
 }
 
