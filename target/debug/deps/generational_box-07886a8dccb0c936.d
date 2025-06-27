@@ -1,0 +1,11 @@
+/Users/jarde/Documents/code/watcher/target/debug/deps/libgenerational_box-07886a8dccb0c936.rmeta: /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/lib.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/entry.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/error.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/references.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/sync.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/unsync.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/../README.md
+
+/Users/jarde/Documents/code/watcher/target/debug/deps/generational_box-07886a8dccb0c936.d: /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/lib.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/entry.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/error.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/references.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/sync.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/unsync.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/../README.md
+
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/lib.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/entry.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/error.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/references.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/sync.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/unsync.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/generational-box-0.6.2/src/../README.md:

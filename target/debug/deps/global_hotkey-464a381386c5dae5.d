@@ -1,0 +1,10 @@
+/Users/jarde/Documents/code/watcher/target/debug/deps/libglobal_hotkey-464a381386c5dae5.rmeta: /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/lib.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/error.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/hotkey.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/platform_impl/mod.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/platform_impl/macos/mod.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/platform_impl/macos/ffi.rs
+
+/Users/jarde/Documents/code/watcher/target/debug/deps/global_hotkey-464a381386c5dae5.d: /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/lib.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/error.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/hotkey.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/platform_impl/mod.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/platform_impl/macos/mod.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/platform_impl/macos/ffi.rs
+
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/lib.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/error.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/hotkey.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/platform_impl/mod.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/platform_impl/macos/mod.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/global-hotkey-0.5.5/src/platform_impl/macos/ffi.rs:

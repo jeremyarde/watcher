@@ -1,0 +1,1 @@
+/Users/jarde/Documents/code/watcher/target/debug/dx-app: /Users/jarde/Documents/code/watcher/background/src/app.rs /Users/jarde/Documents/code/watcher/background/src/lib.rs /Users/jarde/Documents/code/watcher/background/src/scripts.rs /Users/jarde/Documents/code/watcher/dx-app/src/main.rs

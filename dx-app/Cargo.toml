@@ -1,0 +1,10 @@
+[package]
+name = "dx-app"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+background = { path = "../background" }
+dioxus = { version = "0.6.3", features = ["desktop"] }
+dioxus-desktop = "0.6.3"
+humantime = "*"

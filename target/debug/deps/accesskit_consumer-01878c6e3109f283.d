@@ -1,0 +1,10 @@
+/Users/jarde/Documents/code/watcher/target/debug/deps/libaccesskit_consumer-01878c6e3109f283.rmeta: /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/lib.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/tree.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/node.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/filters.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/iterators.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/text.rs
+
+/Users/jarde/Documents/code/watcher/target/debug/deps/accesskit_consumer-01878c6e3109f283.d: /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/lib.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/tree.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/node.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/filters.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/iterators.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/text.rs
+
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/lib.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/tree.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/node.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/filters.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/iterators.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.26.0/src/text.rs:

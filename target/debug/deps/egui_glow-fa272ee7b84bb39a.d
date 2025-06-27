@@ -1,0 +1,11 @@
+/Users/jarde/Documents/code/watcher/target/debug/deps/libegui_glow-fa272ee7b84bb39a.rmeta: /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/lib.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/painter.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/misc_util.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/shader_version.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/vao.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/shader/vertex.glsl /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/shader/fragment.glsl
+
+/Users/jarde/Documents/code/watcher/target/debug/deps/egui_glow-fa272ee7b84bb39a.d: /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/lib.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/painter.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/misc_util.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/shader_version.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/vao.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/shader/vertex.glsl /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/shader/fragment.glsl
+
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/lib.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/painter.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/misc_util.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/shader_version.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/vao.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/shader/vertex.glsl:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/egui_glow-0.31.1/src/shader/fragment.glsl:

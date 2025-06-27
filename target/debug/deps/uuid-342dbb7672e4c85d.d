@@ -1,0 +1,13 @@
+/Users/jarde/Documents/code/watcher/target/debug/deps/libuuid-342dbb7672e4c85d.rmeta: /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/lib.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/builder.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/error.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/non_nil.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/parser.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/fmt.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/timestamp.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/external.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/macros.rs
+
+/Users/jarde/Documents/code/watcher/target/debug/deps/uuid-342dbb7672e4c85d.d: /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/lib.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/builder.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/error.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/non_nil.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/parser.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/fmt.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/timestamp.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/external.rs /Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/macros.rs
+
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/lib.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/builder.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/error.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/non_nil.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/parser.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/fmt.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/timestamp.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/external.rs:
+/Users/jarde/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/uuid-1.17.0/src/macros.rs:
