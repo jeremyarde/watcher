@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-eframe = "0.31.1"
+eframe = { version = "0.31.1", features = ["persistence"] }
 env_logger = "0.11.8"
 serde = { version = "1.0.219", features = ["derive"] }
+background = { path = "../background" }
+log = "0.4.27"

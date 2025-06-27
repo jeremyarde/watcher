@@ -7,9 +7,11 @@ use std::{
     time::{Duration, Instant},
 };
 
+use serde::{Deserialize, Serialize};
+
 use crate::scripts::{ScriptType, load_scripts};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Config {
     pub break_duration: Duration,
     pub break_interval: Duration,
@@ -17,15 +19,14 @@ pub struct Config {
     pub eye_strain_break_duration: Duration,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Stats {
     pub total_time_per_app: HashMap<String, Duration>,
     pub session_count_per_app: HashMap<String, usize>,
     // Add more fields as needed
 }
 
-// #[derive(Deserialize, Serialize)]
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AppState {
     pub last_break_at: Instant,
     pub last_eye_strain_break_at: Instant,

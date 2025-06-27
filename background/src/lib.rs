@@ -1,5 +1,5 @@
-mod app;
-mod scripts;
+pub mod app;
+pub mod scripts;
 
 use std::{
     sync::{Arc, Mutex},
