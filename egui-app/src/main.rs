@@ -1,13 +1,44 @@
 use arc_swap::ArcSwap;
 use background::app::AppState;
-use eframe::egui;
+use background::pomodoro::PomodoroState;
 use eframe::egui::viewport::ViewportId;
+use eframe::egui::{self, Widget};
 use log::info;
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
+use std::net::TcpStream;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
+
+use crate::widgets::WidgetEnum;
+
+mod widgets;
+
+// #[derive(Deserialize, Serialize)]
+// #[derive(Debug)]
+pub struct MyApp {
+    appstate: Arc<ArcSwap<AppState>>,
+    notification_open: bool,
+    notification_viewport_id: ViewportId,
+    show_immediate_viewport: bool,
+    show_deferred_viewport: Arc<AtomicBool>,
+    minimized: bool,
+    maximized_position: egui::Pos2,
+    minimized_position: egui::Pos2,
+    inner_size: egui::Vec2,
+    maximized_size: egui::Vec2,
+    minimized_size: egui::Vec2,
+    top_panel_hovered: bool,
+    // Visibility toggles for widgets
+    show_title_bar: bool,
+    show_main_content: bool,
+    show_immediate_window: bool,
+    show_deferred_window: bool,
+    show_pomodoro: bool,
+    widgets: Vec<WidgetEnum>,
+}
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> eframe::Result {
@@ -37,15 +68,15 @@ fn main() -> eframe::Result {
 
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([400.0, 50.0])
+            // .with_inner_size([400.0, 50.0])
             // .with_titlebar_buttons_shown(true)
             // .with_title_shown(false)
             .with_taskbar(false)
             .with_always_on_top()
-            .with_decorations(true)
+            .with_decorations(false)
             .with_transparent(true)
-            .with_position([1000.0, 100.0]),
-
+            // .with_position([1000.0, 100.0])
+            .with_inner_size([400.0, 100.0]),
         ..Default::default()
     };
     eframe::run_native(
@@ -53,15 +84,6 @@ fn main() -> eframe::Result {
         native_options,
         Box::new(|cc| Ok(Box::new(MyApp::new(cc, appstate)))),
     )
-}
-
-// #[derive(Deserialize, Serialize)]
-#[derive(Debug)]
-pub struct MyApp {
-    appstate: Arc<ArcSwap<AppState>>,
-    notification_open: bool,
-    notification_viewport_id: ViewportId,
-    show_immediate_viewport: bool,
 }
 
 impl MyApp {
@@ -84,6 +106,98 @@ impl MyApp {
             notification_open: false,
             notification_viewport_id: ViewportId::from_hash_of("notification_window"),
             show_immediate_viewport: false,
+            show_deferred_viewport: Arc::new(AtomicBool::new(false)),
+            minimized: false,
+            maximized_position: egui::Pos2::new(1000.0, 100.0),
+            minimized_position: egui::Pos2::new(10.0, 10.0),
+            inner_size: egui::Vec2::new(400.0, 50.0),
+            maximized_size: egui::Vec2::new(400.0, 50.0),
+            minimized_size: egui::Vec2::new(400.0, 50.0),
+            top_panel_hovered: false,
+            show_title_bar: true,
+            show_main_content: true,
+            show_immediate_window: true,
+            show_deferred_window: true,
+            show_pomodoro: true,
+            widgets: vec![
+                WidgetEnum::Pomodoro(crate::widgets::pomodoro::PomodoroTimer {
+                    duration: Duration::from_secs(25 * 60),
+                    duration_str: "25:00".to_string(),
+                    start_at: None,
+                    show_pomodoro: true,
+                    label: String::from("Task"),
+                    completed_count: 0,
+                    history: vec![],
+                }),
+                WidgetEnum::ApplicationTimer(crate::widgets::application_timer::ApplicationTimer {
+                    app: "Application".to_string(),
+                    duration: Duration::from_secs(25 * 60),
+                }),
+            ],
+        }
+    }
+
+    fn show_file_button(&mut self, ui: &mut egui::Ui, ctx: &egui::Context) {
+        let is_web = cfg!(target_arch = "wasm32");
+        if !is_web {
+            ui.menu_button("File", |ui| {
+                if ui.button("Quit").clicked() {
+                    ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                }
+                egui::widgets::global_theme_preference_buttons(ui);
+            });
+        }
+    }
+
+    fn show_hide_button(
+        &mut self,
+        ui: &mut egui::Ui,
+        ctx: &egui::Context,
+        just_moved_window: &mut bool,
+    ) {
+        if ui.button("Hide").clicked() {
+            ctx.input(|i| {
+                if let Some(rect) = i.viewport().outer_rect {
+                    self.maximized_position = rect.min;
+                    self.maximized_size = rect.size();
+                }
+            });
+            self.minimized = true;
+            ctx.send_viewport_cmd(egui::ViewportCommand::InnerSize(self.minimized_size));
+            ctx.send_viewport_cmd(egui::ViewportCommand::OuterPosition(
+                self.minimized_position,
+            ));
+            *just_moved_window = true;
+        }
+    }
+
+    fn show_drag_area(&mut self, ui: &mut egui::Ui, ctx: &egui::Context) {
+        let available = ui.available_size_before_wrap();
+        if available.y > 0.0 {
+            let (_, rect) = ui.allocate_space(egui::vec2(32.0, 32.0));
+            let response = ui
+                .interact(
+                    rect,
+                    ui.id().with("drag_area"),
+                    egui::Sense::click_and_drag(),
+                )
+                .on_hover_cursor(egui::CursorIcon::Grab);
+            if response.dragged() {
+                ctx.send_viewport_cmd(egui::ViewportCommand::StartDrag);
+            }
+            if response.drag_stopped() {
+                ctx.input(|i| {
+                    if let Some(rect) = i.viewport().outer_rect {
+                        self.maximized_position = rect.min;
+                        self.maximized_size = rect.size();
+                    }
+                    log::info!(
+                        "Maximized drag stopped: pos={:?}, size={:?}",
+                        self.maximized_position,
+                        self.maximized_size
+                    );
+                });
+            }
         }
     }
 }
@@ -95,130 +209,111 @@ impl eframe::App for MyApp {
     // }
 
     /// Called each time the UI needs repainting, which may be many times per second.
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        ctx.request_repaint();
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            // The top panel is often a good place for a menu bar:
+    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+        // Track if we just programmatically moved the window
+        let mut just_moved_window = false;
 
-            egui::menu::bar(ui, |ui| {
-                // NOTE: no File->Quit on web pages!
-                let is_web = cfg!(target_arch = "wasm32");
-                if !is_web {
-                    ui.menu_button("File", |ui| {
-                        if ui.button("Quit").clicked() {
-                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-                        }
-                        // Move theme preference buttons here
-                        egui::widgets::global_theme_preference_buttons(ui);
-                    });
-                    ui.add_space(16.0);
-                }
-            });
+        // Always track the current position and size
+        let (current_pos, current_size) = ctx.input(|i| {
+            if let Some(rect) = i.viewport().outer_rect {
+                (rect.min, rect.size())
+            } else {
+                (egui::Pos2::new(0.0, 0.0), egui::Vec2::new(0.0, 0.0))
+            }
         });
+        if self.minimized {
+            // Update minimized position and size if window moved or resized
+            if current_pos != self.minimized_position {
+                self.minimized_position = current_pos;
+            }
+            if current_size != self.minimized_size {
+                self.minimized_size = current_size;
+            }
+        } else {
+            // Update maximized position and size if window moved or resized
+            if current_pos != self.maximized_position {
+                self.maximized_position = current_pos;
+            }
+            if current_size != self.maximized_size {
+                self.maximized_size = current_size;
+            }
+        }
+
+        // Unhide menu if any panels are hidden
+        if !self.show_title_bar
+            || !self.show_main_content
+            || !self.show_immediate_window
+            || !self.show_deferred_window
+            || !self.show_pomodoro
+        {
+            egui::TopBottomPanel::bottom("unhide_panel").show(ctx, |ui| {
+                ui.horizontal(|ui| {
+                    ui.label("Show hidden widgets:");
+                    if !self.show_title_bar && ui.button("Title Bar").clicked() {
+                        self.show_title_bar = true;
+                    }
+                    if !self.show_main_content && ui.button("Main Content").clicked() {
+                        self.show_main_content = true;
+                    }
+                    if !self.show_pomodoro && ui.button("Pomodoro Timer").clicked() {
+                        self.show_pomodoro = true;
+                    }
+                    if !self.show_immediate_window && ui.button("Immediate Window").clicked() {
+                        self.show_immediate_window = true;
+                    }
+                    if !self.show_deferred_window && ui.button("Deferred Window").clicked() {
+                        self.show_deferred_window = true;
+                    }
+                });
+            });
+        }
+
+        if self.show_title_bar {
+            egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+                egui::menu::bar(ui, |ui| {
+                    ui.horizontal_centered(|ui| {
+                        // Drag handle with background and border
+                        let drag_area = ui
+                            .add_sized(
+                                [60.0, 24.0],
+                                egui::Label::new("⠿ Move")
+                                    .sense(egui::Sense::click_and_drag())
+                                    .wrap(),
+                            )
+                            .on_hover_text("Drag window")
+                            .highlight();
+                        if drag_area.dragged() {
+                            ctx.send_viewport_cmd(egui::ViewportCommand::StartDrag);
+                        }
+                        ui.separator();
+                        self.show_file_button(ui, ctx);
+                        ui.separator();
+                        self.show_hide_button(ui, ctx, &mut just_moved_window);
+                        ui.separator();
+                        if ui.button("🗙").on_hover_text("Hide this top bar").clicked() {
+                            self.show_title_bar = false;
+                        }
+                    });
+                });
+                // Subtle separator below top bar
+                ui.add(egui::Separator::default());
+            });
+        }
 
         egui::CentralPanel::default().show(ctx, |ui| {
             puffin::profile_scope!("central_panel");
-            let appstate = self.appstate.load();
-            let active_session = appstate.active_session.clone();
-            let stats = appstate.stats.clone();
-
-            // Notification button
-            // if ui.button("🔔 Notifications").clicked() {
-            //     if !self.notification_open() {
-            //         self.set_notification_open(true);
-            //     }
-            // }
-            ui.checkbox(
-                &mut self.show_immediate_viewport,
-                "Show immediate child viewport",
-            );
-
-            let mut show_deferred_viewport = self.notification_open;
-            ui.checkbox(&mut show_deferred_viewport, "Show deferred child viewport");
-            self.notification_open = show_deferred_viewport;
-
-            ui.horizontal(|ui| {
-                if let Some(session) = active_session {
-                    let now = std::time::Instant::now();
-                    let duration = now.duration_since(session.start_at);
-                    let secs = duration.as_secs();
-                    let mins = secs / 60;
-                    let secs = secs % 60;
-                    ui.label(egui::RichText::new(format!("{}", session.app.trim())).strong());
-                    ui.add_space(4.0);
-                    ui.label(egui::RichText::new(session.window_title.trim()).italics());
-                    ui.add_space(4.0);
-                    ui.label(egui::RichText::new(format!("⏱ {:02}:{:02}", mins, secs)).monospace());
-                } else {
-                    ui.label("No session");
-                }
-
-                // Top 3 apps summary, compact
-                let mut app_times: Vec<_> = stats.total_time_per_app.iter().collect();
-                app_times.sort_by_key(|&(_, &d)| std::cmp::Reverse(d));
-                if !app_times.is_empty() {
-                    ui.add_space(8.0);
-                    for (i, (app, duration)) in app_times.iter().take(3).enumerate() {
-                        let mins = duration.as_secs() / 60;
-                        let secs = duration.as_secs() % 60;
-                        if i > 0 {
-                            ui.add_space(4.0);
-                        }
-                        ui.label(format!("{}: {:02}:{:02}", app.trim(), mins, secs));
-                    }
-                }
-            });
+            for widget in &mut self.widgets {
+                puffin::profile_scope!("show_widget");
+                egui::Frame::group(ui.style())
+                    .fill(ui.visuals().extreme_bg_color)
+                    .corner_radius(egui::CornerRadius::same(8))
+                    .inner_margin(egui::Margin::same(2))
+                    .show(ui, |ui| {
+                        widget.show(ui, &self.appstate);
+                    });
+            }
             ctx.request_repaint();
         });
-
-        // Show notification viewport if open
-        if self.notification_open {
-            let notification_viewport_id = self.notification_viewport_id;
-            ctx.show_viewport_deferred(
-                notification_viewport_id,
-                eframe::egui::ViewportBuilder::default()
-                    .with_title("Notifications")
-                    .with_inner_size([300.0, 200.0]),
-                move |ctx, _class| {
-                    eframe::egui::CentralPanel::default().show(ctx, |ui| {
-                        ui.label("This is your notifications window!");
-                        if ui.button("Close").clicked() {
-                            ctx.send_viewport_cmd_to(
-                                notification_viewport_id,
-                                egui::ViewportCommand::Close,
-                            );
-                        }
-                        // Add more notification-related buttons here
-                    });
-                },
-            );
-        }
-
-        if self.show_immediate_viewport {
-            ctx.show_viewport_immediate(
-                egui::ViewportId::from_hash_of("immediate_viewport"),
-                egui::ViewportBuilder::default()
-                    .with_title("Immediate Viewport")
-                    .with_inner_size([200.0, 100.0]),
-                |ctx, class| {
-                    assert!(
-                        class == egui::ViewportClass::Immediate,
-                        "This egui backend doesn't support multiple viewports"
-                    );
-
-                    egui::CentralPanel::default().show(ctx, |ui| {
-                        ui.label("Hello from immediate viewport");
-                    });
-
-                    if ctx.input(|i| i.viewport().close_requested()) {
-                        // Tell parent viewport that we should not show next frame:
-                        self.show_immediate_viewport = false;
-                    }
-                },
-            );
-        }
-
-        // Track notification window state
     }
 }
 
@@ -229,14 +324,19 @@ fn start_puffin_server() {
         Ok(puffin_server) => {
             log::info!("Run:  cargo install puffin_viewer && puffin_viewer --url 127.0.0.1:8585");
 
-            std::process::Command::new("puffin_viewer")
-                .arg("--url")
-                .arg("127.0.0.1:8585")
-                .spawn()
-                .ok();
+            // Check if puffin_viewer is already running
+            let viewer_running = TcpStream::connect("127.0.0.1:8585").is_ok();
 
-            // We can store the server if we want, but in this case we just want
-            // it to keep running. Dropping it closes the server, so let's not drop it!
+            if !viewer_running {
+                std::process::Command::new("puffin_viewer")
+                    .arg("--url")
+                    .arg("127.0.0.1:8585")
+                    .spawn()
+                    .ok();
+            } else {
+                log::info!("puffin_viewer already running, not spawning a new one.");
+            }
+
             #[expect(clippy::mem_forget)]
             std::mem::forget(puffin_server);
         }

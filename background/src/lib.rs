@@ -1,4 +1,5 @@
 pub mod app;
+pub mod pomodoro;
 pub mod scripts;
 
 use std::{

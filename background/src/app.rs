@@ -9,6 +9,7 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
+use crate::pomodoro::{PomodoroState, PomodoroTimer};
 use crate::scripts::{ScriptType, load_scripts};
 
 #[derive(Clone, Debug)]
@@ -37,6 +38,9 @@ pub struct AppState {
     pub value: f32,
     pub scripts: HashMap<ScriptType, String>,
     pub stats: Stats,
+    pub pomodoro_timer: PomodoroTimer,
+    // frontend related
+    // pub show_eye_strain_break: bool,
 }
 
 impl AppState {
@@ -100,28 +104,13 @@ impl AppState {
             eye_strain_break_duration: Duration::from_secs(10),
         };
         let sessions = vec![];
-        // let sessions_clone = sessions.clone();
-        // let config_clone = config.clone();
-        // std::thread::spawn(move || {
-        //     let scripts = load_scripts();
-        //     let mut active_session = create_session(&scripts);
-        //     loop {
-        //         let now = Instant::now();
-        //         let session = create_session(&scripts);
-        //         if session.app != active_session.app {
-        //             active_session.end_at = now;
-        //             if let Ok(mut sessions) = sessions_clone.lock() {
-        //                 sessions.push(active_session);
-        //             }
-        //             active_session = session;
-        //             active_session.start_at = now;
-        //         }
-        //         std::thread::sleep(Duration::from_millis(2000));
-        //     }
-        // });
-
         let active_session = create_session(&load_scripts());
-
+        let pomodoro_timer = PomodoroTimer::new(
+            Duration::from_secs(25 * 60), // 25 min work
+            Duration::from_secs(5 * 60),  // 5 min short break
+            Duration::from_secs(15 * 60), // 15 min long break
+            4,                            // 4 cycles before long break
+        );
         Self {
             active_session: Some(active_session),
             last_break_at: Instant::now(),
@@ -135,8 +124,29 @@ impl AppState {
                 total_time_per_app: HashMap::new(),
                 session_count_per_app: HashMap::new(),
             },
+            pomodoro_timer,
         }
     }
+
+    // pub fn update_pomodoro(&mut self) {
+    //     self.pomodoro_timer.update();
+    // }
+
+    // pub fn start_pomodoro(&mut self) {
+    //     self.pomodoro_timer.start();
+    // }
+
+    // pub fn reset_pomodoro(&mut self) {
+    //     self.pomodoro_timer.reset();
+    // }
+
+    // pub fn pomodoro_state(&self) -> PomodoroState {
+    //     self.pomodoro_timer.state
+    // }
+
+    // pub fn pomodoro_time_left(&self) -> Duration {
+    //     self.pomodoro_timer.time_left()
+    // }
 }
 
 #[derive(Debug, Clone)]
