@@ -304,25 +304,67 @@ impl eframe::App for MyApp {
             puffin::profile_scope!("central_panel");
             let mut widgets_to_remove = Vec::new();
 
-            for (index, widget) in self.widgets.iter_mut().enumerate() {
-                puffin::profile_scope!("show_widget");
-                egui::Frame::group(ui.style())
-                    .fill(ui.visuals().extreme_bg_color)
-                    .corner_radius(egui::CornerRadius::same(8))
-                    .inner_margin(egui::Margin::same(2))
-                    .show(ui, |ui| {
-                        ui.horizontal(|ui| {
-                            // Widget content
-                            ui.vertical(|ui| {
-                                widget.show(ui, &self.appstate);
-                            });
+            // Determine layout based on available width
+            let available_width = ui.available_width();
+            let available_height = ui.available_height();
+            let use_horizontal = available_width > 600.0; // Threshold for switching to horizontal
 
-                            // Delete button
-                            if ui.button("🗑").on_hover_text("Delete widget").clicked() {
-                                widgets_to_remove.push(index);
-                            }
-                        });
-                    });
+            // Calculate widget count before the loops to avoid borrow checker issues
+            let widget_count = self.widgets.len() as f32;
+
+            if use_horizontal {
+                // Horizontal layout for wider viewports
+                ui.horizontal_wrapped(|ui| {
+                    for (index, widget) in self.widgets.iter_mut().enumerate() {
+                        puffin::profile_scope!("show_widget");
+                        // Calculate widget size to fill available space with better bounds checking
+                        let widget_width = ((available_width - 40.0) / widget_count.max(1.0))
+                            .max(150.0)
+                            .min(available_width - 40.0); // Better minimum width
+                        let widget_height = (available_height - 40.0).max(80.0); // Better minimum height
+
+                        egui::Frame::group(ui.style())
+                            .fill(ui.visuals().extreme_bg_color)
+                            .corner_radius(egui::CornerRadius::same(8))
+                            .inner_margin(egui::Margin::same(4))
+                            .show(ui, |ui| {
+                                ui.set_min_size(egui::vec2(widget_width, widget_height));
+                                ui.vertical(|ui| {
+                                    widget.show(ui, &self.appstate);
+                                    ui.add_space(4.0);
+                                    if ui.button("🗑").on_hover_text("Delete widget").clicked() {
+                                        widgets_to_remove.push(index);
+                                    }
+                                });
+                            });
+                    }
+                });
+            } else {
+                // Single column layout for narrow viewports
+                ui.vertical(|ui| {
+                    for (index, widget) in self.widgets.iter_mut().enumerate() {
+                        puffin::profile_scope!("show_widget");
+                        // Calculate widget size to fill available space with better bounds checking
+                        let widget_height =
+                            ((available_height - 60.0) / widget_count.max(1.0)).max(80.0); // Better minimum height
+                        let widget_width = (available_width - 20.0).max(150.0); // Better minimum width
+
+                        egui::Frame::group(ui.style())
+                            .fill(ui.visuals().extreme_bg_color)
+                            .corner_radius(egui::CornerRadius::same(8))
+                            .inner_margin(egui::Margin::same(4))
+                            .show(ui, |ui| {
+                                ui.set_min_size(egui::vec2(widget_width, widget_height));
+                                ui.horizontal(|ui| {
+                                    widget.show(ui, &self.appstate);
+                                    ui.add_space(4.0);
+                                    if ui.button("🗑").on_hover_text("Delete widget").clicked() {
+                                        widgets_to_remove.push(index);
+                                    }
+                                });
+                            });
+                    }
+                });
             }
 
             // Remove widgets that were marked for deletion (in reverse order to maintain indices)
