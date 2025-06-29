@@ -12,8 +12,7 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use crate::widgets::WidgetEnum;
-
+use crate::widgets::{AddWidget, WidgetEnum};
 mod widgets;
 
 // #[derive(Deserialize, Serialize)]
@@ -128,6 +127,7 @@ impl MyApp {
                     label: String::from("Task"),
                     completed_count: 0,
                     history: vec![],
+                    is_running: false,
                 }),
                 WidgetEnum::ApplicationTimer(crate::widgets::application_timer::ApplicationTimer {
                     app: "Application".to_string(),
@@ -302,16 +302,66 @@ impl eframe::App for MyApp {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             puffin::profile_scope!("central_panel");
-            for widget in &mut self.widgets {
+            let mut widgets_to_remove = Vec::new();
+
+            for (index, widget) in self.widgets.iter_mut().enumerate() {
                 puffin::profile_scope!("show_widget");
                 egui::Frame::group(ui.style())
                     .fill(ui.visuals().extreme_bg_color)
                     .corner_radius(egui::CornerRadius::same(8))
                     .inner_margin(egui::Margin::same(2))
                     .show(ui, |ui| {
-                        widget.show(ui, &self.appstate);
+                        ui.horizontal(|ui| {
+                            // Widget content
+                            ui.vertical(|ui| {
+                                widget.show(ui, &self.appstate);
+                            });
+
+                            // Delete button
+                            if ui.button("🗑").on_hover_text("Delete widget").clicked() {
+                                widgets_to_remove.push(index);
+                            }
+                        });
                     });
             }
+
+            // Remove widgets that were marked for deletion (in reverse order to maintain indices)
+            for &index in widgets_to_remove.iter().rev() {
+                if index < self.widgets.len() {
+                    self.widgets.remove(index);
+                }
+            }
+
+            // Add widget button with dropdown
+            ui.horizontal(|ui| {
+                ui.menu_button("➕ Add Widget", |ui| {
+                    if ui.button("Pomodoro Timer").clicked() {
+                        self.widgets.push(WidgetEnum::Pomodoro(
+                            crate::widgets::pomodoro::PomodoroTimer {
+                                duration: Duration::from_secs(25 * 60),
+                                duration_str: "25:00".to_string(),
+                                start_at: None,
+                                show_pomodoro: true,
+                                label: String::from("New Task"),
+                                completed_count: 0,
+                                history: vec![],
+                                is_running: false,
+                            },
+                        ));
+                        ui.close_menu();
+                    }
+                    if ui.button("Application Timer").clicked() {
+                        self.widgets.push(WidgetEnum::ApplicationTimer(
+                            crate::widgets::application_timer::ApplicationTimer {
+                                app: "Application".to_string(),
+                                duration: Duration::from_secs(0),
+                            },
+                        ));
+                        ui.close_menu();
+                    }
+                });
+            });
+
             ctx.request_repaint();
         });
     }

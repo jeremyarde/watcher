@@ -2,6 +2,7 @@ use background::app::AppState;
 use eframe::egui;
 use std::time::Duration;
 
+#[derive(Debug, PartialEq, Default)]
 pub struct ApplicationTimer {
     pub app: String,
     pub duration: Duration,
@@ -11,7 +12,7 @@ impl ApplicationTimer {
     pub fn show(&self, ui: &mut egui::Ui, appstate: &AppState) {
         let active_session = appstate.active_session.clone();
         let stats = appstate.stats.clone();
-        ui.vertical_centered_justified(|ui| {
+        ui.vertical(|ui| {
             if let Some(session) = active_session {
                 let now = std::time::Instant::now();
                 let duration = now.duration_since(session.start_at);
